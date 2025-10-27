@@ -157,13 +157,13 @@ data:
             from_provider = bool(p and p.name == "Petasus Auth Provider")
             return in_group and from_provider
 
-      # OIDC 인증 플로우에 "기존" TOTP 등록 스테이지 바인딩 (재사용)
+      # 기본 인증 플로우에 "기존" TOTP 등록 스테이지 바인딩 (재사용)
       - model: authentik_flows.flowstagebinding
         id: bind-petasus-totp-enroll
         identifiers:
           order: 320
           stage: !Find [authentik_stages_authenticator_totp.authenticatortotpstage, [name, "default-authenticator-totp-setup"]]
-          target: !Find [authentik_flows.flow, [slug, default-provider-authorization-explicit-consent]]
+          target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
 
       # 위 바인딩에 정책 연결
       - model: authentik_policies.policybinding
@@ -172,13 +172,13 @@ data:
           order: 10
           policy: !KeyOf petasus-require-totp-for-service-accounts
 
-      # OIDC 인증 플로우에 TOTP 검증 바인딩
+      # 기본 인증 플로우에 TOTP 검증 바인딩
       - model: authentik_flows.flowstagebinding
         id: bind-petasus-totp-validate
         identifiers:
           order: 340
           stage: !KeyOf petasus-totp-validate
-          target: !Find [authentik_flows.flow, [slug, default-provider-authorization-explicit-consent]]
+          target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
 
       # 검증 바인딩에도 같은 정책 연결
       - model: authentik_policies.policybinding
@@ -200,7 +200,7 @@ data:
           stage: !KeyOf petasus-logout-stage
           target: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
 
-      # OAuth2 Provider for KubeSphere (RS256로 전환)
+      # OAuth2 Provider for KubeSphere
       - model: authentik_providers_oauth2.oauth2provider
         identifiers:
           name: "Petasus Auth Provider"
@@ -209,7 +209,6 @@ data:
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-explicit-consent]]
           authentication_flow: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
           invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
-          signing_key: !Find [authentik_crypto.certificatekeypair, [name, "authentik Self-signed Certificate"]]
           client_type: "confidential"
           client_id: "petasus-oauth2-client-2024"
           client_secret: "petasus-oauth2-secret-k8s-2024-secure-token-12345"
@@ -231,11 +230,3 @@ data:
           name: "Petasus KubeSphere Integration"
           provider: !Find [authentik_providers_oauth2.oauth2provider, [name, "Petasus Auth Provider"]]
           policy_engine_mode: "all"
-
-      # --- (ADD) 인가 플로우에 TOTP 등록 스테이지 추가 ---
-      - model: authentik_flows.flowstagebinding
-        id: bind-consent-flow-totp-setup
-        identifiers:
-          order: 10
-          stage: !Find [authentik_stages_authenticator_totp.authenticatortotpstage, [name, "default-authenticator-totp-setup"]]
-          target: !Find [authentik_flows.flow, [slug, default-provider-authorization-explicit-consent]]
