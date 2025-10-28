@@ -23,7 +23,6 @@ data:
           branding_logo: "http://192.168.15.157:30880/assets/logo.svg"
           branding_favicon: "http://192.168.15.157:30880/assets/logo.svg"
           branding_background: "http://192.168.15.157:30880/assets/resources/images/img/img_login.svg"
-          branding_default_flow_background: "http://192.168.15.157:30880/assets/resources/images/img/img_login.svg"
           ui_footer_links: []
           ui_show_footer: false
           ui_theme: "automatic"

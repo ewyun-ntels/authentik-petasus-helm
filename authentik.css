@@ -147,6 +147,7 @@ html > form > input {
     flex-grow: 1;
 }
 
+/*
 .pf-c-login__footer {
     flex-grow: 2;
     display: flex;
@@ -158,6 +159,19 @@ html > form > input {
     justify-content: center;
     padding: 2rem 0;
 }
+*/
+
+.pf-c-login__footer {
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    justify-content: flex-start !important;
+}
+
+.pf-c-login__footer ul.pf-c-list.pf-m-inline {
+    display: none !important;
+}
+
 
 /* #endregion */
 
