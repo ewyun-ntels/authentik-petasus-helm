@@ -147,29 +147,31 @@ html > form > input {
     flex-grow: 1;
 }
 
-/* Footer 제거 및 정렬 초기화 */
+/*
+.pf-c-login__footer {
+    flex-grow: 2;
+    display: flex;
+    justify-content: end;
+    flex-direction: column;
+}
+
+.pf-c-login__footer ul.pf-c-list.pf-m-inline {
+    justify-content: center;
+    padding: 2rem 0;
+}
+*/
+
 .pf-c-login__footer {
     padding: 0 !important;
     margin: 0 !important;
     min-height: 0 !important;
     justify-content: flex-start !important;
 }
+
 .pf-c-login__footer ul.pf-c-list.pf-m-inline {
     display: none !important;
 }
 
-/* Powered by authentik 제거 */
-.ak-footer,
-footer.ak-footer,
-.ak-powered-by,
-ak-footer,
-ak-powered-by {
-    display: none !important;
-    visibility: hidden !important;
-    height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
 
 /* #endregion */
 

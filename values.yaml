@@ -160,6 +160,10 @@ authentik:
   # -- Secret key used for cookie singing and unique user IDs,
   # don't change this after the first install
   secret_key: "REPLACE_WITH_LONG_RANDOM_SECRET_1234567890"
+  # -- Custom CSS configuration
+  customCSS:
+    # -- Enable custom CSS deployment from authentik.css file
+    enabled: true
   events:
     context_processors:
       # -- Path for the GeoIP City database. If the file doesn't exist, GeoIP features are disabled.

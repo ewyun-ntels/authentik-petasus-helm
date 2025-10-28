@@ -86,7 +86,7 @@ spec:
             {{- with (concat .Values.global.envFrom .Values.server.envFrom) }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
-          {{- if or .Values.geoip.enabled .Values.global.volumeMounts .Values.server.volumeMounts .Values.blueprints.configMaps .Values.blueprints.secrets }}
+          {{- if or .Values.geoip.enabled .Values.global.volumeMounts .Values.server.volumeMounts .Values.blueprints.configMaps .Values.blueprints.secrets .Values.authentik.customCSS.enabled }}
           volumeMounts:
             {{- with .Values.global.volumeMounts }}
               {{- toYaml . | nindent 12 }}
@@ -97,6 +97,12 @@ spec:
             {{- if .Values.geoip.enabled }}
             - name: geoip-db
               mountPath: /geoip
+            {{- end }}
+            {{- if .Values.authentik.customCSS.enabled }}
+            - name: authentik-css
+              mountPath: /web/dist/authentik.css
+              subPath: authentik.css
+              readOnly: true
             {{- end }}
             {{- range $name := .Values.blueprints.configMaps }}
             - name: blueprints-cm-{{ $name }}
@@ -219,7 +225,7 @@ spec:
         {{- end }}
         {{- end }}
       {{- end }}
-      {{- if or .Values.geoip.enabled .Values.global.volumes .Values.server.volumes .Values.blueprints.configMaps .Values.blueprints.secrets }}
+      {{- if or .Values.geoip.enabled .Values.global.volumes .Values.server.volumes .Values.blueprints.configMaps .Values.blueprints.secrets .Values.authentik.customCSS.enabled }}
       volumes:
       {{- with .Values.global.volumes }}
         {{- toYaml . | nindent 8 }}
@@ -230,6 +236,11 @@ spec:
       {{- if .Values.geoip.enabled }}
         - name: geoip-db
           emptyDir: {}
+      {{- end }}
+      {{- if .Values.authentik.customCSS.enabled }}
+        - name: authentik-css
+          configMap:
+            name: {{ include "authentik.fullname" . }}-css
       {{- end }}
       {{- range $name := .Values.blueprints.configMaps }}
         - name: blueprints-cm-{{ $name }}
