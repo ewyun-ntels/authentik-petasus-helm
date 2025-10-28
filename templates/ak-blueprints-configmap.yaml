@@ -81,6 +81,7 @@ data:
           key: "petasus-api-key-2024-secure-token"
           intent: "api"
           description: "Petasus REST API Management Token"
+          expiring: false
 
       # 커스텀 Scope Mapping - preferred_username
       - model: authentik_providers_oauth2.scopemapping
