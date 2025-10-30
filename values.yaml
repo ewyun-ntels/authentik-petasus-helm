@@ -517,9 +517,9 @@ server:
     # -- authentik server service type
     type: NodePort
     # -- authentik server service http port for NodePort service type (only if `server.service.type` is set to `NodePort`)
-    nodePortHttp: 30083
+    nodePortHttp: 30081
     # -- authentik server service https port for NodePort service type (only if `server.service.type` is set to `NodePort`)
-    nodePortHttps: 30045
+    nodePortHttps: 30083
     # -- authentik server service http port
     servicePortHttp: 80
     # -- authentik server service https port
