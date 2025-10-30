@@ -344,13 +344,22 @@ data:
 
       - model: authentik_providers_oauth2.scopemapping
         identifiers:
-          name: "Petasus Role Mapping"
+          name: "role"
         attrs:
           scope_name: "role"
           description: "User role information for Petasus"
           expression: |
             return {"role": request.user.attributes.get("role", "")}
-            
+
+      - model: authentik_providers_oauth2.scopemapping
+        identifiers:
+          name: "description"
+        attrs:
+          scope_name: "description"
+          description: "User description information for Petasus"
+          expression: |
+            return {"description": request.user.attributes.get("description", "")}
+
 
       # (C) 등록 스테이지 존재 보장 (Helm 템플릿 충돌 피하려고 friendly_name_template 생략)
       - model: authentik_stages_authenticator_totp.authenticatortotpstage
@@ -441,7 +450,8 @@ data:
             - !Find [authentik_providers_oauth2.scopemapping, [name, "preferred_username"]]
             - !Find [authentik_providers_oauth2.scopemapping, [name, "sub"]]
             - !Find [authentik_providers_oauth2.scopemapping, [name, "name"]]
-            - !Find [authentik_providers_oauth2.scopemapping, [name, "Petasus Role Mapping"]]
+            - !Find [authentik_providers_oauth2.scopemapping, [name, "role"]]
+            - !Find [authentik_providers_oauth2.scopemapping, [name, "description"]]
             - !Find [authentik_providers_oauth2.scopemapping, [managed, "goauthentik.io/providers/oauth2/scope-email"]]
 
       - model: authentik_core.application
