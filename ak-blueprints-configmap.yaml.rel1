@@ -273,22 +273,6 @@ data:
           stage: !KeyOf petasus-logout-stage
           target: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
 
-      # (NEW) Redirect Stage -> order: 20
-      - model: authentik_stages_redirect.redirectstage
-        id: petasus-logout-redirect
-        identifiers:
-          name: "petasus-logout-redirect"
-        attrs:
-          # UI에서 선택한 'Static' 모드와 동일
-          mode: "static"
-          target_static : "{{ .Values.global.brand.baseURL}}/"
-
-      - model: authentik_flows.flowstagebinding
-        identifiers:
-          order: 20
-          stage: !KeyOf petasus-logout-redirect
-          target: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
-
       # -------------------------
       # OAuth2 Provider & Application
       # -------------------------
