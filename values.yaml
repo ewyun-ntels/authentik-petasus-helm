@@ -10,6 +10,9 @@ kubeVersionOverride: ""
 ## Globally shared configuration for authentik components.
 global:
 
+  brand:
+    baseURL: "http://192.168.15.157:30880"
+
   # To override bitnami images
   security:
     allowInsecureImages: true

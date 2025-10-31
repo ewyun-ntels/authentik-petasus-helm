@@ -130,9 +130,12 @@ html > form > input {
 
 /* Ensure card is displayed on small screens */
 .pf-c-login__main {
-    display: block;
-    position: relative;
-    width: 100%;
+  display: block;
+  position: relative;
+  width: 100%;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important; /* 부드러운 그림자 */
+  padding: 24px !important; /* 내부 여백 */
 }
 
 .ak-login-container {
@@ -153,22 +156,7 @@ html > form > input {
     margin: 0 !important;
     min-height: 0 !important;
     justify-content: flex-start !important;
-}
-.pf-c-login__footer ul.pf-c-list.pf-m-inline {
     display: none !important;
-}
-
-/* Powered by authentik 제거 */
-.ak-footer,
-footer.ak-footer,
-.ak-powered-by,
-ak-footer,
-ak-powered-by {
-    display: none !important;
-    visibility: hidden !important;
-    height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
 }
 
 /* #endregion */
