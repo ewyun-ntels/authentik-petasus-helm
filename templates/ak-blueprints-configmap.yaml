@@ -28,7 +28,7 @@ data:
           branding_default_flow_background: "{{ .Values.global.brand.baseURL}}/assets/resources/images/img/img_login.svg"
           ui_footer_links: []
           ui_show_footer: false
-          ui_theme: "automatic"
+          ui_theme: "light"
           default_locale: "en"
           flow_authentication: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
           flow_invalidation: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
@@ -55,6 +55,18 @@ data:
               box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important; /* 부드러운 그림자 */
               padding: 24px !important; /* 내부 여백 */
             }
+            ak-flow-executor .pf-c-login__main header .pf-c-content > p,
+            ak-flow-executor .pf-c-login__main .pf-c-content > p:first-of-type {
+              display: none !important;
+            }
+            ak-flow-executor .pf-c-login__main header {
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+            ak-flow-executor .pf-c-login__main .pf-c-form {
+              margin-top: 0 !important;
+            }
+
 
       # -------------------------
       # Users / Groups / Token
@@ -233,7 +245,7 @@ data:
           slug: "petasus-authentication-flow"
         attrs:
           name:  "Petasus"   # 일부 버전에서 필수
-          title: "Petasus"   # 일부/최신 버전에서 필수
+          title: "\u200B"   # 일부/최신 버전에서 필수
           designation: authentication
 
       # 3) 바인딩: 10 = Identification(+Password 내장)
