@@ -28,9 +28,9 @@ data:
           branding_default_flow_background: "{{ .Values.global.brand.baseURL}}/assets/resources/images/img/img_login.svg"
           ui_footer_links: []
           ui_show_footer: false
-          ui_theme: "automatic"
+          ui_theme: "light"
           default_locale: "en"
-          flow_authentication: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+          flow_authentication: !Find [authentik_flows.flow, [slug, petasus-authentication-flow]]
           flow_invalidation: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
           flow_recovery: !Find [authentik_flows.flow, [slug, default-recovery-flow]]
           flow_unenrollment: !Find [authentik_flows.flow, [slug, default-unenrollment-flow]]
@@ -55,6 +55,18 @@ data:
               box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important; /* 부드러운 그림자 */
               padding: 24px !important; /* 내부 여백 */
             }
+            ak-flow-executor .pf-c-login__main header .pf-c-content > p,
+            ak-flow-executor .pf-c-login__main .pf-c-content > p:first-of-type {
+              display: none !important;
+            }
+            ak-flow-executor .pf-c-login__main header {
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+            ak-flow-executor .pf-c-login__main .pf-c-form {
+              margin-top: 0 !important;
+            }
+
 
       # -------------------------
       # Users / Groups / Token
@@ -155,69 +167,13 @@ data:
           scope_name: "description"
           description: "User description information for Petasus"
           expression: |
-            return {"description": request.user.attributes.get("description", "")}      
+            return {"description": request.user.attributes.get("description", "")}           
 
       # -------------------------
-      # MFA Stage on Provider Invalidation
+      # LogIn Stage on Provider Invalidation 
       # -------------------------
-      # (C) 등록 스테이지 존재 보장 (Helm 템플릿 충돌 피하려고 friendly_name_template 생략)
-      - model: authentik_stages_authenticator_totp.authenticatortotpstage
-        identifiers:
-          name: "default-authenticator-totp-setup"
-        attrs:
-          issuer: "Petasus"
-          digits: 6
-          period: 30
-          algorithm: "sha1"
 
-      # --- Enforce MFA validation -> auto-enroll to TOTP when not configured ---
-      - model: authentik_stages_authenticator_validate.authenticatorvalidatestage
-        identifiers:
-          name: "default-authentication-mfa-validation"
-        attrs:
-          device_classes:
-            - totp
-          not_configured_action: configure
-          configuration_stages:
-            - !Find [authentik_stages_authenticator_totp.authenticatortotpstage, [name, "default-authenticator-totp-setup"]]
-
-
-      # (E) (선택) 특정 사용자만 TOTP 적용하고 싶으면 정책 사용
-      - model: authentik_policies_expression.expressionpolicy
-        id: petasus-require-totp-by-path
-        identifiers:
-          name: "Require TOTP when user.path startswith 'petasus.io'"
-        attrs:
-          expression: |
-            u = request.user
-            if not u:
-              return False
-            if getattr(u, "username", "") == "akadmin":
-              return False
-            p = getattr(u, "path", "") or ""
-            return p == "petasus.io" or p.startswith("petasus.io/")
-
-
-      # --- Identify the MFA validation binding (order 30) in default-authentication-flow
-      - model: authentik_flows.flowstagebinding
-        id: default-authn-mfa-validate-binding
-        identifiers:
-          order: 30
-          stage: !Find [authentik_stages_authenticator_validate.authenticatorvalidatestage, [name, "default-authentication-mfa-validation"]]
-          target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
-
-
-      # --- Bind the policy so MFA runs only when expression returns True
-      - model: authentik_policies.policybinding
-        identifiers:
-          target: !KeyOf default-authn-mfa-validate-binding
-          order: 0
-          policy: !KeyOf petasus-require-totp-by-path      
-
-      # -------------------------
-      # LogIn Stage on Provider Invalidation
-      # -------------------------
-      # 1) 커스텀 Identification 스테이지: 같은 화면에서 ID+PW 받기
+      # 1) 커스텀 Identification 스테이지
       - model: authentik_stages_identification.identificationstage
         identifiers:
           name: "petasus-identification"
@@ -232,32 +188,61 @@ data:
         identifiers:
           slug: "petasus-authentication-flow"
         attrs:
-          name:  "Petasus"   # 일부 버전에서 필수
-          title: "Petasus"   # 일부/최신 버전에서 필수
+          name: "Petasus"
+          title: "\u200B"
           designation: authentication
 
-      # 3) 바인딩: 10 = Identification(+Password 내장)
+      # 3) 바인딩: 10 = Identification(+Password)
       - model: authentik_flows.flowstagebinding
         identifiers:
           order: 10
-          stage:  !Find [authentik_stages_identification.identificationstage, [name, "petasus-identification"]]
+          stage: !Find [authentik_stages_identification.identificationstage, [name, "petasus-identification"]]
           target: !Find [authentik_flows.flow, [slug, petasus-authentication-flow]]
 
-      # 4) 바인딩: 20 = MFA Validate
-      #    (정확한 이름은 default-authentication-mfa-validation 입니다)
+      # 4-a) MFA 조건 정책 (akadmin은 스킵, path가 petasus.io일 때만 True)
+      - model: authentik_policies_expression.expressionpolicy
+        id: petasus-require-totp-by-path
+        identifiers:
+          name: "Require TOTP when user.path startswith 'petasus.io'"
+        attrs:
+          expression: |
+            u = request.user
+            if not u:
+                return False
+            # akadmin 또는 superuser는 항상 MFA 스킵
+            name = (getattr(u, "username", "") or getattr(u, "name", "") or "").lower()
+            if name == "akadmin" or getattr(u, "is_superuser", False):
+                return False
+            # 사용자 attributes에서 path 읽기
+            attrs = getattr(u, "attributes", {}) or {}
+            p = (attrs.get("path", "") or "").lower()
+            return p == "petasus.io" or p.startswith("petasus.io/")
+
+      # 4-b) 바인딩: 20 = MFA Validate (여기에 정책 연결 + 계획 시 평가 ON)
       - model: authentik_flows.flowstagebinding
+        id: petasus-authn-mfa-validate-binding
         identifiers:
           order: 20
-          stage:  !Find [authentik_stages_authenticator_validate.authenticatorvalidatestage, [name, "default-authentication-mfa-validation"]]
+          stage: !Find [authentik_stages_authenticator_validate.authenticatorvalidatestage, [name, "default-authentication-mfa-validation"]]
           target: !Find [authentik_flows.flow, [slug, petasus-authentication-flow]]
+        attrs:
+          evaluate_on_plan: true        # 계획 단계에서 정책 평가 → False면 스테이지 자체 제외(완전 스킵)
+          re_evaluate_policies: false   # 선택: 실행 직전 재평가 비활성화(일관성 유지)
+          policy_engine_mode: any       # 여러 정책 중 하나라도 True면 실행(기본값)
+
+      # 4-c) 위 바인딩에 정책 연결 (Negate 꺼짐)
+      - model: authentik_policies.policybinding
+        identifiers:
+          target: !KeyOf petasus-authn-mfa-validate-binding
+          order: 0
+          policy: !KeyOf petasus-require-totp-by-path
 
       # 5) 바인딩: 30 = User Login Stage
       - model: authentik_flows.flowstagebinding
         identifiers:
           order: 30
-          stage:  !Find [authentik_stages_user_login.userloginstage, [name, "default-authentication-login"]]
+          stage: !Find [authentik_stages_user_login.userloginstage, [name, "default-authentication-login"]]
           target: !Find [authentik_flows.flow, [slug, petasus-authentication-flow]]
-
 
       # -------------------------
       # Logout Stage on Provider Invalidation
@@ -271,6 +256,22 @@ data:
         identifiers:
           order: 10
           stage: !KeyOf petasus-logout-stage
+          target: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
+
+      # (NEW) Redirect Stage -> order: 20
+      - model: authentik_stages_redirect.redirectstage
+        id: petasus-logout-redirect
+        identifiers:
+          name: "petasus-logout-redirect"
+        attrs:
+          # UI에서 선택한 'Static' 모드와 동일
+          mode: "static"
+          target_static : "{{ .Values.global.brand.baseURL}}/"
+
+      - model: authentik_flows.flowstagebinding
+        identifiers:
+          order: 20
+          stage: !KeyOf petasus-logout-redirect
           target: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
 
       # -------------------------
