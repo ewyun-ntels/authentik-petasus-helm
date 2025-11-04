@@ -127,6 +127,28 @@ html > form > input {
 }
 
 /* #region Login adjustments */
+/* ==== Kill 'Not you?' link everywhere in flows (incl. TOTP stages) ==== */
+/* 어떤 스테이지든 flow 내부에서 /flows/-/cancel 또는 /flows/-/default/invalidation 으로 가는 링크는 제거 */
+:where(ak-flow-executor, ak-stage-container, ak-identification-stage, ak-password-stage,
+       ak-user-login-stage, ak-authenticator-stage, ak-authenticator-validate-stage,
+       ak-authenticator-totp-setup-stage, ak-authenticator-totp-validate-stage)
+  a[href*="/flows/-/cancel"],
+:where(ak-flow-executor, ak-stage-container, ak-identification-stage, ak-password-stage,
+       ak-user-login-stage, ak-authenticator-stage, ak-authenticator-validate-stage,
+       ak-authenticator-totp-setup-stage, ak-authenticator-totp-validate-stage)
+  a[href*="/flows/-/default/invalidation"],
+:where(ak-flow-executor) a.pf-c-button.pf-m-link[href*="/flows/-/cancel"],
+:where(ak-flow-executor) a.pf-c-button.pf-m-link[href*="/flows/-/default/invalidation"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* 사용자 칩 옆에 액션으로 붙는 경우까지 포괄 */
+:where(ak-flow-executor) .pf-c-chip + .pf-c-button.pf-m-link {
+  display: none !important;
+}
+/* ////////////////////////////////////////////// */
 
 /* Ensure card is displayed on small screens */
 .pf-c-login__main {

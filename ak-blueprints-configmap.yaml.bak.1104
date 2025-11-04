@@ -194,19 +194,13 @@ data:
       # -------------------------
       # LogIn Stage on Provider Invalidation (Petasus 전용 플로우)
       # -------------------------
-      - model: authentik_stages_password.passwordstage
-        identifiers:
-          name: "default-authentication-password"
-        attrs:
-          allow_show_password: true
-
       - model: authentik_stages_identification.identificationstage
         identifiers:
           name: "petasus-identification"
         attrs:
           user_fields: ["username", "email"]
           case_insensitive_matching: true
-          show_matched_user: false
+          show_matched_user: true
           password_stage: !Find [authentik_stages_password.passwordstage, [name, "default-authentication-password"]]
 
       - model: authentik_flows.flow
@@ -316,17 +310,6 @@ data:
           order: 20
           stage: !KeyOf petasus-logout-redirect
           target: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
-
-      # -------------------------
-      # 무효화 플로우
-      # -------------------------
-      # default-invalidation-flow 맨 끝에 Redirect 스테이지 바인딩
-      - model: authentik_flows.flowstagebinding
-        identifiers:
-          order: 100
-          stage:  !KeyOf petasus-logout-redirect
-          target: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
-
 
       # -------------------------
       # OAuth2 Provider & Application

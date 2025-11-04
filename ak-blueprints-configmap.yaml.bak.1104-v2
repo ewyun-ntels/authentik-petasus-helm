@@ -318,17 +318,6 @@ data:
           target: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
 
       # -------------------------
-      # 무효화 플로우
-      # -------------------------
-      # default-invalidation-flow 맨 끝에 Redirect 스테이지 바인딩
-      - model: authentik_flows.flowstagebinding
-        identifiers:
-          order: 100
-          stage:  !KeyOf petasus-logout-redirect
-          target: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
-
-
-      # -------------------------
       # OAuth2 Provider & Application
       # -------------------------
       - model: authentik_providers_oauth2.oauth2provider
