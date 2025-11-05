@@ -16,16 +16,16 @@ metadata:
 spec:
   type: {{ .Values.server.service.type }}
   ports:
-    - name: {{ .Values.server.service.servicePortHttpName }}
-      protocol: TCP
-      port: {{ .Values.server.service.servicePortHttp }}
-      targetPort: {{ .Values.server.containerPorts.http }}
-      {{- if eq .Values.server.service.type "NodePort" }}
-      nodePort: {{ .Values.server.service.nodePortHttp }}
-      {{- end }}
-      {{- with .Values.server.service.servicePortHttpAppProtocol }}
-      appProtocol: {{ . }}
-      {{- end }}
+  #  - name: {{ .Values.server.service.servicePortHttpName }}
+  #    protocol: TCP
+  #    port: {{ .Values.server.service.servicePortHttp }}
+  #    targetPort: {{ .Values.server.containerPorts.http }}
+  #    {{- if eq .Values.server.service.type "NodePort" }}
+  #    nodePort: {{ .Values.server.service.nodePortHttp }}
+  #    {{- end }}
+  #    {{- with .Values.server.service.servicePortHttpAppProtocol }}
+  #    appProtocol: {{ . }}
+  #    {{- end }}
     - name: {{ .Values.server.service.servicePortHttpsName }}
       protocol: TCP
       port: {{ .Values.server.service.servicePortHttps }}

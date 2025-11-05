@@ -9,9 +9,11 @@ kubeVersionOverride: ""
 
 ## Globally shared configuration for authentik components.
 global:
-
+## Petasus related configuration
   brand:
     baseURL: "http://192.168.15.157:30880"
+
+## Petasus related configuration
 
   # To override bitnami images
   security:
@@ -117,7 +119,7 @@ global:
   #env: []
   env:
     - name: AUTHENTIK_BOOTSTRAP_EMAIL
-      value: "admin@example.com"
+      value: "akadmin@example.com"
     - name: AUTHENTIK_BOOTSTRAP_PASSWORD
       value: "ntels.com"
     # - name: AUTHENTIK_VAR_NAME
@@ -149,9 +151,14 @@ global:
 
   # -- Additional volumes to all deployed Deployments.
   # @default -- `[]` (See [values.yaml])
-  volumes: []
+  # volumes: []
     # - name: custom
     #   emptyDir: {}
+  volumes:
+    - name: dev-shm
+      emptyDir:
+        medium: Memory
+        sizeLimit: 1Gi  
 
 
 ## Authentik configuration
@@ -359,9 +366,12 @@ server:
          value: "{{ .Release.Name }}-postgresql"
 
   # -- Additional volumeMounts to the authentik server main container
-  volumeMounts: []
+  # volumeMounts: []
     # - name: custom
     #   mountPath: /custom
+  volumeMounts:
+    - name: dev-shm
+      mountPath: /dev/shm  
 
   # -- Additional volumes to the authentik server pod
   volumes: []
@@ -520,7 +530,7 @@ server:
     # -- authentik server service type
     type: NodePort
     # -- authentik server service http port for NodePort service type (only if `server.service.type` is set to `NodePort`)
-    nodePortHttp: 30081
+    nodePortHttp: 
     # -- authentik server service https port for NodePort service type (only if `server.service.type` is set to `NodePort`)
     nodePortHttps: 30083
     # -- authentik server service http port
