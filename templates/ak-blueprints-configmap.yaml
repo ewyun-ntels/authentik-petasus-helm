@@ -345,7 +345,7 @@ data:
           client_secret: "petasus-oauth2-secret-k8s-2024-secure-token-12345"
           redirect_uris:
             - matching_mode: strict
-              url: "http://192.168.15.157:30880/oauth/redirect/petasus-kubesphere"
+              url: "{{ .Values.global.brand.baseURL}}/oauth/redirect/petasus-kubesphere"
           property_mappings:
             - !Find [authentik_providers_oauth2.scopemapping, [name, "preferred_username"]]
             - !Find [authentik_providers_oauth2.scopemapping, [name, "sub"]]

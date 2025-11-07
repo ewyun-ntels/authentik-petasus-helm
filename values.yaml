@@ -11,7 +11,7 @@ kubeVersionOverride: ""
 global:
 ## Petasus related configuration
   brand:
-    baseURL: "http://192.168.15.157:30880"
+    baseURL: "https://192.168.15.157:31294"
 
 ## Petasus related configuration
 
@@ -182,7 +182,8 @@ authentik:
       asn: /geoip/GeoLite2-ASN.mmdb
   web:
     # -- Relative path the authentik instance will be available at. Value _must_ contain both a leading and trailing slash.
-    path: /
+    # path: /
+    path: /auth/
   email:
     # -- SMTP Server emails are sent from, fully optional
     host: ""
@@ -528,9 +529,9 @@ server:
     # -- authentik server service labels
     labels: {}
     # -- authentik server service type
-    type: NodePort
+    type: ClusterIP # NodePort
     # -- authentik server service http port for NodePort service type (only if `server.service.type` is set to `NodePort`)
-    nodePortHttp: 
+    nodePortHttp: 30081
     # -- authentik server service https port for NodePort service type (only if `server.service.type` is set to `NodePort`)
     nodePortHttps: 30083
     # -- authentik server service http port
